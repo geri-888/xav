@@ -13,6 +13,7 @@ import net.md_5.bungee.api.CommandSender;
 import net.md_5.bungee.api.ProxyServer;
 import net.md_5.bungee.api.chat.TextComponent;
 import net.md_5.bungee.api.connection.ProxiedPlayer;
+import net.md_5.bungee.api.event.PostLoginEvent;
 import net.md_5.bungee.api.event.PreLoginEvent;
 import net.md_5.bungee.api.plugin.Command;
 import net.md_5.bungee.api.plugin.Listener;
@@ -38,7 +39,7 @@ public final class XavBungeePlugin extends Plugin implements Listener {
         try {
             core.load();
         } catch (IOException exception) {
-            getLogger().severe("XAVPN nem tudott betolteni: " + exception.getMessage());
+            getLogger().severe("XAntiVPN nem tudott betolteni: " + exception.getMessage());
             return;
         }
         getProxy().getPluginManager().registerListener(this, this);
@@ -64,6 +65,26 @@ public final class XavBungeePlugin extends Plugin implements Listener {
                     }
                 } finally {
                     event.completeIntent(XavBungeePlugin.this);
+                }
+            }
+        });
+    }
+
+    @EventHandler
+    public void onPostLogin(final PostLoginEvent event) {
+        final ProxiedPlayer player = event.getPlayer();
+        if (!player.hasPermission(XavConfig.PERM_MOD)) {
+            return;
+        }
+        getProxy().getScheduler().runAsync(this, new Runnable() {
+            @Override
+            public void run() {
+                List<String> lines = core.getUpdateChecker().getNoticeLines();
+                if (lines == null) {
+                    return;
+                }
+                for (String line : lines) {
+                    send(player, line);
                 }
             }
         });
@@ -97,6 +118,10 @@ public final class XavBungeePlugin extends Plugin implements Listener {
                 alt(sender, args);
                 return;
             }
+            if ("reload".equals(sub)) {
+                reload(sender);
+                return;
+            }
             send(sender, core.prefix() + TextUtil.color(core.getConfig().getUsage()));
         }
 
@@ -116,6 +141,19 @@ public final class XavBungeePlugin extends Plugin implements Listener {
                         : "&eNem tortent valtozas: " + args[1]));
             } catch (IOException exception) {
                 send(sender, core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
+            }
+        }
+
+        private void reload(CommandSender sender) {
+            if (!sender.hasPermission(XavConfig.PERM_RELOAD)) {
+                send(sender, core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+                return;
+            }
+            try {
+                core.load();
+                send(sender, core.prefix() + TextUtil.color("&aConfig es adatbazis ujratoltve."));
+            } catch (IOException exception) {
+                send(sender, core.prefix() + TextUtil.color("&cReload sikertelen: " + exception.getMessage()));
             }
         }
 
@@ -173,7 +211,7 @@ public final class XavBungeePlugin extends Plugin implements Listener {
         @Override
         public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
             if (args.length == 1) {
-                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt"), args[0]);
+                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
             }
             if (args.length == 2) {
                 List<String> names = new ArrayList<String>();

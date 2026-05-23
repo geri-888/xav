@@ -9,6 +9,9 @@ import java.util.Locale;
 import java.util.Map;
 
 public final class XavCore {
+    public static final String PLUGIN_NAME = "XAntiVPN";
+    public static final String VERSION = "26.5";
+
     private final File dataFolder;
     private final XavLogger logger;
     private XavConfig config;
@@ -16,6 +19,7 @@ public final class XavCore {
     private WhitelistStore whitelist;
     private PlayerIndex playerIndex;
     private IpApiClient client;
+    private XavUpdateChecker updateChecker;
     private final Map<String, CachedResult> cache = new HashMap<String, CachedResult>();
 
     public XavCore(File dataFolder, XavLogger logger) {
@@ -37,8 +41,9 @@ public final class XavCore {
         this.whitelist = new WhitelistStore(database);
         this.playerIndex = new PlayerIndex(database);
         this.client = new IpApiClient(config);
+        this.updateChecker = new XavUpdateChecker(logger);
         this.cache.clear();
-        logger.info("XAVPN betoltve.");
+        logger.info("XAntiVPN betoltve.");
     }
 
     public XavConfig getConfig() {
@@ -51,6 +56,10 @@ public final class XavCore {
 
     public PlayerIndex getPlayerIndex() {
         return playerIndex;
+    }
+
+    public XavUpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 
     public boolean isWhitelisted(String playerName) {

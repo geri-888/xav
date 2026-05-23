@@ -18,6 +18,7 @@ import org.bukkit.event.EventHandler;
 import org.bukkit.event.EventPriority;
 import org.bukkit.event.Listener;
 import org.bukkit.event.player.AsyncPlayerPreLoginEvent;
+import org.bukkit.event.player.PlayerJoinEvent;
 import org.bukkit.event.player.PlayerLoginEvent;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -41,7 +42,7 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
         try {
             core.load();
         } catch (IOException exception) {
-            getLogger().severe("XAVPN nem tudott betolteni: " + exception.getMessage());
+            getLogger().severe("XAntiVPN nem tudott betolteni: " + exception.getMessage());
             Bukkit.getPluginManager().disablePlugin(this);
             return;
         }
@@ -75,6 +76,31 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
         }
     }
 
+    @EventHandler
+    public void onJoin(final PlayerJoinEvent event) {
+        final Player player = event.getPlayer();
+        if (!player.hasPermission(XavConfig.PERM_MOD)) {
+            return;
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+            @Override
+            public void run() {
+                final List<String> lines = core.getUpdateChecker().getNoticeLines();
+                if (lines == null) {
+                    return;
+                }
+                Bukkit.getScheduler().runTask(XavBukkitPlugin.this, new Runnable() {
+                    @Override
+                    public void run() {
+                        for (String line : lines) {
+                            player.sendMessage(line);
+                        }
+                    }
+                });
+            }
+        });
+    }
+
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
         if (args.length == 0) {
@@ -93,6 +119,9 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
         }
         if ("alt".equals(sub) || "alts".equals(sub)) {
             return alt(sender, args);
+        }
+        if ("reload".equals(sub)) {
+            return reload(sender);
         }
         sender.sendMessage(core.prefix() + TextUtil.color(core.getConfig().getUsage()));
         return true;
@@ -114,6 +143,20 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
                     : "&eNem tortent valtozas: " + args[1]));
         } catch (IOException exception) {
             sender.sendMessage(core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
+        }
+        return true;
+    }
+
+    private boolean reload(CommandSender sender) {
+        if (!sender.hasPermission(XavConfig.PERM_RELOAD)) {
+            sender.sendMessage(core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+            return true;
+        }
+        try {
+            core.load();
+            sender.sendMessage(core.prefix() + TextUtil.color("&aConfig es adatbazis ujratoltve."));
+        } catch (IOException exception) {
+            sender.sendMessage(core.prefix() + TextUtil.color("&cReload sikertelen: " + exception.getMessage()));
         }
         return true;
     }
@@ -225,7 +268,7 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt"), args[0]);
+            return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
         }
         if (args.length == 2) {
             List<String> names = new ArrayList<String>();

@@ -26,7 +26,7 @@ public final class IpApiClient {
         connection.setRequestMethod("GET");
         connection.setConnectTimeout(config.getTimeoutMs());
         connection.setReadTimeout(config.getTimeoutMs());
-        connection.setRequestProperty("User-Agent", "XAVPN/1.0");
+        connection.setRequestProperty("User-Agent", "XAntiVPN/26.5");
         int status = connection.getResponseCode();
         InputStream stream = status >= 200 && status < 300 ? connection.getInputStream() : connection.getErrorStream();
         String body = read(stream);

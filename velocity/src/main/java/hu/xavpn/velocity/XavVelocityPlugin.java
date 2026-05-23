@@ -5,6 +5,7 @@ import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
+import com.velocitypowered.api.event.connection.PostLoginEvent;
 import com.velocitypowered.api.event.proxy.ProxyInitializeEvent;
 import com.velocitypowered.api.plugin.Plugin;
 import com.velocitypowered.api.plugin.annotation.DataDirectory;
@@ -33,7 +34,7 @@ import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
 
-@Plugin(id = "xavpn", name = "XAVPN", version = "1.0.0", description = "IPAPI.is based anti VPN/proxy/datacenter checker.", authors = {"XAVPN"})
+@Plugin(id = "xavpn", name = "XAntiVPN", version = "26.5", description = "IPAPI.is based anti VPN/proxy/datacenter checker.", authors = {"geri_888"})
 public final class XavVelocityPlugin {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
@@ -55,7 +56,7 @@ public final class XavVelocityPlugin {
         try {
             core.load();
         } catch (IOException exception) {
-            logger.error("XAVPN nem tudott betolteni: {}", exception.getMessage());
+            logger.error("XAntiVPN nem tudott betolteni: {}", exception.getMessage());
             return;
         }
         CommandMeta meta = server.getCommandManager().metaBuilder("xav").aliases("xavpn").plugin(this).build();
@@ -78,6 +79,26 @@ public final class XavVelocityPlugin {
                 }
             }
         });
+    }
+
+    @Subscribe
+    public void onPostLogin(final PostLoginEvent event) {
+        final Player player = event.getPlayer();
+        if (!player.hasPermission(XavConfig.PERM_MOD)) {
+            return;
+        }
+        server.getScheduler().buildTask(this, new Runnable() {
+            @Override
+            public void run() {
+                List<String> lines = core.getUpdateChecker().getNoticeLines();
+                if (lines == null) {
+                    return;
+                }
+                for (String line : lines) {
+                    player.sendMessage(component(line));
+                }
+            }
+        }).schedule();
     }
 
     private final class XavCommand implements SimpleCommand {
@@ -105,6 +126,10 @@ public final class XavVelocityPlugin {
                 alt(invocation, args);
                 return;
             }
+            if ("reload".equals(sub)) {
+                reload(invocation);
+                return;
+            }
             send(invocation, core.prefix() + TextUtil.color(core.getConfig().getUsage()));
         }
 
@@ -124,6 +149,19 @@ public final class XavVelocityPlugin {
                         : "&eNem tortent valtozas: " + args[1]));
             } catch (IOException exception) {
                 send(invocation, core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
+            }
+        }
+
+        private void reload(Invocation invocation) {
+            if (!invocation.source().hasPermission(XavConfig.PERM_RELOAD)) {
+                send(invocation, core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+                return;
+            }
+            try {
+                core.load();
+                send(invocation, core.prefix() + TextUtil.color("&aConfig es adatbazis ujratoltve."));
+            } catch (IOException exception) {
+                send(invocation, core.prefix() + TextUtil.color("&cReload sikertelen: " + exception.getMessage()));
             }
         }
 
@@ -182,7 +220,7 @@ public final class XavVelocityPlugin {
         public List<String> suggest(Invocation invocation) {
             String[] args = invocation.arguments();
             if (args.length == 1) {
-                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt"), args[0]);
+                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
             }
             if (args.length == 2) {
                 List<String> names = new ArrayList<String>();

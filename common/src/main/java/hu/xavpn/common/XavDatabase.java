@@ -190,11 +190,6 @@ public final class XavDatabase {
     }
 
     private void migrateLegacyFiles() throws IOException {
-        File marker = new File(dataFolder, ".db-migrated");
-        if (marker.exists()) {
-            return;
-        }
-
         File whitelist = new File(dataFolder, "whitelist.txt");
         if (whitelist.exists()) {
             for (String line : FileUtil.readLines(whitelist)) {
@@ -222,8 +217,6 @@ public final class XavDatabase {
                 }
             }
         }
-
-        FileUtil.writeUtf8(marker, "Migrated legacy whitelist.txt and players.properties into database.\n");
     }
 
     private static void loadDriver(String className) throws SQLException {

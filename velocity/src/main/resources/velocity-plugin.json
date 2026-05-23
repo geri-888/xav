@@ -1,8 +1,8 @@
 {
   "id": "xavpn",
-  "name": "XAVPN",
-  "version": "1.0.0",
+  "name": "XAntiVPN",
+  "version": "26.5",
   "description": "IPAPI.is based anti VPN/proxy/datacenter checker.",
-  "authors": ["XAVPN"],
+  "authors": ["geri_888"],
   "main": "hu.xavpn.velocity.XavVelocityPlugin"
 }

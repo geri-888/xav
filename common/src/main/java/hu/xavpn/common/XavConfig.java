@@ -10,6 +10,7 @@ public final class XavConfig {
     public static final String PERM_WHITELIST = "xav.whitelist";
     public static final String PERM_BYPASS = "xav.kivetel";
     public static final String PERM_MOD = "xav.mod";
+    public static final String PERM_RELOAD = "xav.reload";
 
     private final String apiKey;
     private final String endpoint;
@@ -80,7 +81,7 @@ public final class XavConfig {
                 yaml.getString("messages.moderator-blocked", "&a{player} &fcsatlakozása blokkolva lett az AntiVPN által &7(&c{flags}&7)"),
                 yaml.getString("messages.prefix", "&8[&cXAV&8]&r "),
                 yaml.getString("messages.no-permission", "&cNincs jogod ehhez."),
-                yaml.getString("messages.usage", "&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>"));
+                yaml.getString("messages.usage", "&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav reload"));
     }
 
     private static void addCheck(SimpleYaml yaml, List<CheckFlag> checks, String key, String label, String code) {
@@ -163,7 +164,6 @@ public final class XavConfig {
                 + "  fail-closed: false\n"
                 + "\n"
                 + "storage:\n"
-                + "  # h2 = LuckPerms/LiteBans style local database file. sqlite = SQLite3 file.\n"
                 + "  type: \"h2\"\n"
                 + "\n"
                 + "blocked-checks:\n"
@@ -207,7 +207,7 @@ public final class XavConfig {
                 + "messages:\n"
                 + "  prefix: \"&8[&cXAV&8]&r \"\n"
                 + "  no-permission: \"&cNincs jogod ehhez.\"\n"
-                + "  usage: \"&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>\"\n"
+                + "  usage: \"&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav reload\"\n"
                 + "  moderator-blocked: \"&a{player} &fcsatlakozása blokkolva lett az AntiVPN által &7(&c{flags}&7)\"\n"
                 + "  blocked:\n"
                 + "    - \"&c&lCSATLAKOZÁS BLOKKOLVA\"\n"
