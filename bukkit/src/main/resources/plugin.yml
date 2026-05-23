@@ -1,0 +1,19 @@
+name: XAVPN
+version: 1.0.0
+main: hu.xavpn.bukkit.XavBukkitPlugin
+author: XAVPN
+description: IPAPI.is based anti VPN/proxy/datacenter checker.
+commands:
+  xav:
+    description: XAVPN commands
+    usage: /xav <kivetel|eltavolit|ip|alt>
+permissions:
+  xav.whitelist:
+    description: Allows whitelist add/remove commands.
+    default: op
+  xav.kivetel:
+    description: Bypass the anti VPN check on supported platforms.
+    default: false
+  xav.mod:
+    description: Allows IP, ISP and alt lookup commands.
+    default: op

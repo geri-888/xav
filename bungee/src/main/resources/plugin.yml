@@ -1,0 +1,5 @@
+name: XAVPN
+version: 1.0.0
+main: hu.xavpn.bungee.XavBungeePlugin
+author: XAVPN
+description: IPAPI.is based anti VPN/proxy/datacenter checker.
