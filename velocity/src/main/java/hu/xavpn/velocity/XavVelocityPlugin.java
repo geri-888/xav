@@ -33,6 +33,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.TimeUnit;
 
 @Plugin(id = "xavpn", name = "XAntiVPN", version = "26.5", description = "IPAPI.is based anti VPN/proxy/datacenter checker.", authors = {"geri_888"})
 public final class XavVelocityPlugin {
@@ -90,6 +91,9 @@ public final class XavVelocityPlugin {
         server.getScheduler().buildTask(this, new Runnable() {
             @Override
             public void run() {
+                if (!player.isActive() || !player.hasPermission(XavConfig.PERM_MOD)) {
+                    return;
+                }
                 List<String> lines = core.getUpdateChecker().getNoticeLines();
                 if (lines == null) {
                     return;
@@ -98,7 +102,7 @@ public final class XavVelocityPlugin {
                     player.sendMessage(component(line));
                 }
             }
-        }).schedule();
+        }).delay(20, TimeUnit.SECONDS).schedule();
     }
 
     private final class XavCommand implements SimpleCommand {
