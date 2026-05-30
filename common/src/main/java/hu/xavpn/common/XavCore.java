@@ -10,7 +10,7 @@ import java.util.Map;
 
 public final class XavCore {
     public static final String PLUGIN_NAME = "XAntiVPN";
-    public static final String VERSION = "26.5";
+    public static final String VERSION = XavVersion.get();
 
     private final File dataFolder;
     private final XavLogger logger;

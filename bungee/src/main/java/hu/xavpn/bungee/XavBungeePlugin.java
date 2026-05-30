@@ -118,6 +118,10 @@ public final class XavBungeePlugin extends Plugin implements Listener {
                 alt(sender, args);
                 return;
             }
+            if ("version".equals(sub)) {
+                version(sender);
+                return;
+            }
             if ("reload".equals(sub)) {
                 reload(sender);
                 return;
@@ -142,6 +146,22 @@ public final class XavBungeePlugin extends Plugin implements Listener {
             } catch (IOException exception) {
                 send(sender, core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
             }
+        }
+
+        private void version(final CommandSender sender) {
+            if (!sender.hasPermission(XavConfig.PERM_MOD)) {
+                send(sender, core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+                return;
+            }
+            getProxy().getScheduler().runAsync(XavBungeePlugin.this, new Runnable() {
+                @Override
+                public void run() {
+                    List<String> lines = core.getUpdateChecker().getStatusLines();
+                    for (String line : lines) {
+                        send(sender, core.prefix() + line);
+                    }
+                }
+            });
         }
 
         private void reload(CommandSender sender) {
@@ -211,7 +231,7 @@ public final class XavBungeePlugin extends Plugin implements Listener {
         @Override
         public Iterable<String> onTabComplete(CommandSender sender, String[] args) {
             if (args.length == 1) {
-                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
+                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "version", "reload"), args[0]);
             }
             if (args.length == 2) {
                 List<String> names = new ArrayList<String>();

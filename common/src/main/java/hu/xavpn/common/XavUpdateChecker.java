@@ -26,13 +26,7 @@ public final class XavUpdateChecker {
     public synchronized List<String> getNoticeLines() {
         long now = System.currentTimeMillis();
         if (latestVersion == null || now - lastCheck > CHECK_INTERVAL_MS) {
-            try {
-                latestVersion = fetchLatestVersion();
-                lastCheck = now;
-            } catch (IOException exception) {
-                lastCheck = now;
-                logger.warn("Frissites ellenorzes sikertelen: " + exception.getMessage());
-            }
+            refresh(now);
         }
         if (latestVersion == null || !isNewer(latestVersion, XavCore.VERSION)) {
             return null;
@@ -42,6 +36,38 @@ public final class XavUpdateChecker {
         lines.add(TextUtil.color("&7| &e" + latestVersion + " &7verzio elerheto! Jelenlegi verziod: &c" + XavCore.VERSION));
         lines.add(TextUtil.color("&7----------------------------------------"));
         return lines;
+    }
+
+    public synchronized List<String> getStatusLines() {
+        long now = System.currentTimeMillis();
+        if (latestVersion == null || now - lastCheck > CHECK_INTERVAL_MS) {
+            refresh(now);
+        }
+        List<String> lines = new ArrayList<String>();
+        if (latestVersion == null) {
+            lines.add(TextUtil.color("&cNem sikerult ellenorizni a frissitest."));
+            lines.add(TextUtil.color("&7Jelenlegi verzio: &f" + XavCore.VERSION));
+            return lines;
+        }
+        if (isNewer(latestVersion, XavCore.VERSION)) {
+            lines.add(TextUtil.color("&eFrissites elerheto."));
+            lines.add(TextUtil.color("&7Jelenlegi verzio: &c" + XavCore.VERSION));
+            lines.add(TextUtil.color("&7Uj verzio: &a" + latestVersion));
+            return lines;
+        }
+        lines.add(TextUtil.color("&aA rendszer naprakesz."));
+        lines.add(TextUtil.color("&7Jelenlegi verzio: &f" + XavCore.VERSION));
+        return lines;
+    }
+
+    private void refresh(long now) {
+        try {
+            latestVersion = fetchLatestVersion();
+            lastCheck = now;
+        } catch (IOException exception) {
+            lastCheck = now;
+            logger.warn("Frissites ellenorzes sikertelen: " + exception.getMessage());
+        }
     }
 
     @SuppressWarnings("unchecked")

@@ -120,6 +120,9 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
         if ("alt".equals(sub) || "alts".equals(sub)) {
             return alt(sender, args);
         }
+        if ("version".equals(sub)) {
+            return version(sender);
+        }
         if ("reload".equals(sub)) {
             return reload(sender);
         }
@@ -144,6 +147,28 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
         } catch (IOException exception) {
             sender.sendMessage(core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
         }
+        return true;
+    }
+
+    private boolean version(final CommandSender sender) {
+        if (!sender.hasPermission(XavConfig.PERM_MOD)) {
+            sender.sendMessage(core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+            return true;
+        }
+        Bukkit.getScheduler().runTaskAsynchronously(this, new Runnable() {
+            @Override
+            public void run() {
+                final List<String> lines = core.getUpdateChecker().getStatusLines();
+                Bukkit.getScheduler().runTask(XavBukkitPlugin.this, new Runnable() {
+                    @Override
+                    public void run() {
+                        for (String line : lines) {
+                            sender.sendMessage(core.prefix() + line);
+                        }
+                    }
+                });
+            }
+        });
         return true;
     }
 
@@ -268,7 +293,7 @@ public final class XavBukkitPlugin extends JavaPlugin implements Listener, Comma
     @Override
     public List<String> onTabComplete(CommandSender sender, Command command, String alias, String[] args) {
         if (args.length == 1) {
-            return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
+            return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "version", "reload"), args[0]);
         }
         if (args.length == 2) {
             List<String> names = new ArrayList<String>();

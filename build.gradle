@@ -1,0 +1,32 @@
+plugins {
+    id "base"
+}
+
+def versionProperties = new Properties()
+file("common/src/main/resources/xantivpn-version.properties").withInputStream {
+    versionProperties.load(it)
+}
+
+allprojects {
+    group = "hu.xavpn"
+    version = versionProperties.getProperty("version")
+}
+
+subprojects {
+    apply plugin: "java-library"
+
+    java {
+        withSourcesJar()
+    }
+
+    tasks.withType(JavaCompile).configureEach {
+        options.encoding = "UTF-8"
+    }
+
+    tasks.withType(ProcessResources).configureEach {
+        inputs.property("version", rootProject.version)
+        filesMatching(["plugin.yml", "velocity-plugin.json"]) {
+            expand(version: rootProject.version)
+        }
+    }
+}

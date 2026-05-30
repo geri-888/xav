@@ -81,7 +81,7 @@ public final class XavConfig {
                 yaml.getString("messages.moderator-blocked", "&a{player} &fcsatlakozása blokkolva lett az AntiVPN által &7(&c{flags}&7)"),
                 yaml.getString("messages.prefix", "&8[&cXAV&8]&r "),
                 yaml.getString("messages.no-permission", "&cNincs jogod ehhez."),
-                yaml.getString("messages.usage", "&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav reload"));
+                yaml.getString("messages.usage", "&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav version, /xav reload"));
     }
 
     private static void addCheck(SimpleYaml yaml, List<CheckFlag> checks, String key, String label, String code) {
@@ -207,7 +207,7 @@ public final class XavConfig {
                 + "messages:\n"
                 + "  prefix: \"&8[&cXAV&8]&r \"\n"
                 + "  no-permission: \"&cNincs jogod ehhez.\"\n"
-                + "  usage: \"&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav reload\"\n"
+                + "  usage: \"&eHasznalat: /xav kivetel <jatekos>, /xav eltavolit <jatekos>, /xav ip <jatekos>, /xav alt <jatekos|ip>, /xav version, /xav reload\"\n"
                 + "  moderator-blocked: \"&a{player} &fcsatlakozása blokkolva lett az AntiVPN által &7(&c{flags}&7)\"\n"
                 + "  blocked:\n"
                 + "    - \"&c&lCSATLAKOZÁS BLOKKOLVA\"\n"

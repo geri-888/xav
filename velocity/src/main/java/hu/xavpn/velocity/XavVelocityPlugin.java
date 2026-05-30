@@ -3,6 +3,7 @@ package hu.xavpn.velocity;
 import com.google.inject.Inject;
 import com.velocitypowered.api.command.CommandMeta;
 import com.velocitypowered.api.command.SimpleCommand;
+import com.velocitypowered.api.event.EventTask;
 import com.velocitypowered.api.event.Subscribe;
 import com.velocitypowered.api.event.connection.PreLoginEvent;
 import com.velocitypowered.api.event.connection.PostLoginEvent;
@@ -32,10 +33,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
-import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 
-@Plugin(id = "xavpn", name = "XAntiVPN", version = "26.5", description = "IPAPI.is based anti VPN/proxy/datacenter checker.", authors = {"geri_888"})
+@Plugin(id = "xavpn", name = "XAntiVPN", description = "IPAPI.is based anti VPN/proxy/datacenter checker.", authors = {"geri_888"})
 public final class XavVelocityPlugin {
     private static final LegacyComponentSerializer LEGACY = LegacyComponentSerializer.legacySection();
 
@@ -65,8 +65,8 @@ public final class XavVelocityPlugin {
     }
 
     @Subscribe
-    public CompletableFuture<Void> onPreLogin(final PreLoginEvent event) {
-        return CompletableFuture.runAsync(new Runnable() {
+    public EventTask onPreLogin(final PreLoginEvent event) {
+        return EventTask.async(new Runnable() {
             @Override
             public void run() {
                 String name = event.getUsername();
@@ -130,6 +130,10 @@ public final class XavVelocityPlugin {
                 alt(invocation, args);
                 return;
             }
+            if ("version".equals(sub)) {
+                version(invocation);
+                return;
+            }
             if ("reload".equals(sub)) {
                 reload(invocation);
                 return;
@@ -154,6 +158,22 @@ public final class XavVelocityPlugin {
             } catch (IOException exception) {
                 send(invocation, core.prefix() + TextUtil.color("&cNem sikerult menteni a whitelistet."));
             }
+        }
+
+        private void version(final Invocation invocation) {
+            if (!invocation.source().hasPermission(XavConfig.PERM_MOD)) {
+                send(invocation, core.prefix() + TextUtil.color(core.getConfig().getNoPermission()));
+                return;
+            }
+            server.getScheduler().buildTask(XavVelocityPlugin.this, new Runnable() {
+                @Override
+                public void run() {
+                    List<String> lines = core.getUpdateChecker().getStatusLines();
+                    for (String line : lines) {
+                        send(invocation, core.prefix() + line);
+                    }
+                }
+            }).schedule();
         }
 
         private void reload(Invocation invocation) {
@@ -224,7 +244,7 @@ public final class XavVelocityPlugin {
         public List<String> suggest(Invocation invocation) {
             String[] args = invocation.arguments();
             if (args.length == 1) {
-                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "reload"), args[0]);
+                return filter(Arrays.asList("kivetel", "eltavolit", "ip", "alt", "version", "reload"), args[0]);
             }
             if (args.length == 2) {
                 List<String> names = new ArrayList<String>();

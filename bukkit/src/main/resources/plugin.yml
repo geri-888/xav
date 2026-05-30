@@ -1,5 +1,5 @@
 name: XAntiVPN
-version: 26.5
+version: ${version}
 main: hu.xavpn.bukkit.XavBukkitPlugin
 author: geri_888
 description: IPAPI.is based anti VPN/proxy/datacenter checker.
@@ -7,7 +7,7 @@ website: https://github.com/geri-888/xav
 commands:
   xav:
     description: XAntiVPN commands
-    usage: /xav <kivetel|eltavolit|ip|alt|reload>
+    usage: /xav <kivetel|eltavolit|ip|alt|version|reload>
 permissions:
   xav.whitelist:
     description: Allows whitelist add/remove commands.
